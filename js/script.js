@@ -61,30 +61,7 @@ class ToDo {
     }
   }
 
-  completedAnimated(elem) {
-    let count = 0;
-    let flyInterval;
-    const flyAnimate = () => {
-      flyInterval = requestAnimationFrame(flyAnimate);
-      if (count <= 1500) {
-        count += 100;
-        elem.style.right = count + 'px';
-      } else {
-        cancelAnimationFrame(flyInterval);
-        this.completedItem(elem);
-      }
-    };
-    let animate;
-    if (!animate) {
-      flyInterval = requestAnimationFrame(flyAnimate);
-      animate = true;
-    } else {
-      animate = false;
-      cancelAnimationFrame(flyInterval);
-    }
-  }
-
-  deleteAnimated(elem) {
+  animated(elem, callback) {
     let count = 0;
     let flyInterval;
     const flyAnimate = () => {
@@ -94,7 +71,7 @@ class ToDo {
         elem.style.right = count + 'px';
       } else {
         cancelAnimationFrame(flyInterval);
-        this.deleteItem(elem);
+        callback(elem);
       }
     };
     let animate;
@@ -105,7 +82,6 @@ class ToDo {
       animate = false;
       cancelAnimationFrame(flyInterval);
     }
-
   }
 
   deleteItem(elem) {
@@ -153,10 +129,10 @@ class ToDo {
     this.todoContainer.addEventListener('click', event => {
       const target = event.target;
       if (target.matches('.todo-remove')) {
-        this.deleteAnimated(target.closest('.todo-item'));
+        this.animated(target.closest('.todo-item'), this.deleteItem.bind(this));
       }
       if (target.matches('.todo-complete')) {
-        this.completedAnimated(target.closest('.todo-item'));
+        this.animated(target.closest('.todo-item'), this.completedItem.bind(this));
       }
       if (target.matches('.todo-edit')) {
         this.updateItem(target.closest('.todo-item'));
