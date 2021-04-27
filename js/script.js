@@ -54,6 +54,7 @@ class ToDo {
       //ключь нужен для поиска, манипуляций и удаления елементов в коллекции
       this.todoData.set(newTodo.key, newTodo); //добавили в коллекцию ключ значение
       this.render();
+      this.input.value = '';
     } else {
       alert('Пустое дело добавить нельзя!');
     }
