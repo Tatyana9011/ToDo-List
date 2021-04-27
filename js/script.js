@@ -30,7 +30,8 @@ class ToDo {
     li.insertAdjacentHTML('beforeend', `
     <span class="text-todo">${todoElem.value}</span>
 				<div class="todo-buttons">
-					<button class="todo-remove"></button>
+					<button class="todo-edit"></button>
+          <button class="todo-remove"></button>
 					<button class="todo-complete"></button>
 				</div>
     `);
@@ -60,13 +61,60 @@ class ToDo {
     }
   }
 
+  completedAnimated(elem) {
+    let count = 0;
+    let flyInterval;
+    const flyAnimate = () => {
+      flyInterval = requestAnimationFrame(flyAnimate);
+      if (count <= 1500) {
+        count += 100;
+        elem.style.right = count + 'px';
+      } else {
+        cancelAnimationFrame(flyInterval);
+        this.completedItem(elem);
+      }
+    };
+    let animate;
+    if (!animate) {
+      flyInterval = requestAnimationFrame(flyAnimate);
+      animate = true;
+    } else {
+      animate = false;
+      cancelAnimationFrame(flyInterval);
+    }
+  }
+
+  deleteAnimated(elem) {
+    let count = 0;
+    let flyInterval;
+    const flyAnimate = () => {
+      flyInterval = requestAnimationFrame(flyAnimate);
+      if (count <= 2000) {
+        count += 100;
+        elem.style.right = count + 'px';
+      } else {
+        cancelAnimationFrame(flyInterval);
+        this.deleteItem(elem);
+      }
+    };
+    let animate;
+    if (!animate) {
+      flyInterval = requestAnimationFrame(flyAnimate);
+      animate = true;
+    } else {
+      animate = false;
+      cancelAnimationFrame(flyInterval);
+    }
+
+  }
+
   deleteItem(elem) {
     if (this.todoData.has(elem.key)) {
       this.todoData.delete(`${elem.key}`);
     }
     this.render();
     this.addToStorage();
-    /* elem.remove();
+    /* elem.remove();//тоже рабочий вариант удаления
     this.todoData = [...this.todoData].filter(item => item[0] !== elem.key);
     this.addToStorage(); */
   }
@@ -85,14 +133,33 @@ class ToDo {
     this.addToStorage();
   }
 
+  updateItem(elem) {
+    this.todoData.forEach(item => {
+      if (elem.key === item.key) {
+        elem.contentEditable = 'true';
+        elem.style.backgroundColor = "#d6f4f8";
+        elem.focus();
+        elem.addEventListener('blur', () => {
+          const updateValue = elem.textContent;
+          elem.style.backgroundColor = '#fff';
+          item.value = updateValue.trim();
+          this.addToStorage();
+        });
+      }
+    });
+  }
+
   handler() {
     this.todoContainer.addEventListener('click', event => {
       const target = event.target;
       if (target.matches('.todo-remove')) {
-        this.deleteItem(target.closest('.todo-item'));
+        this.deleteAnimated(target.closest('.todo-item'));
       }
       if (target.matches('.todo-complete')) {
-        this.completedItem(target.closest('.todo-item'));
+        this.completedAnimated(target.closest('.todo-item'));
+      }
+      if (target.matches('.todo-edit')) {
+        this.updateItem(target.closest('.todo-item'));
       }
     });
   }
